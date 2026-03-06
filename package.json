@@ -1,0 +1,19 @@
+{
+  "name": "codex-changelog-bot",
+  "version": "1.0.0",
+  "description": "Automated X/Twitter bot that posts summaries of OpenAI Codex CLI releases",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "dry-run": "DRY_RUN=true tsx src/index.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "twitter-api-v2": "^1.18.2"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  }
+}
