@@ -6,7 +6,7 @@ const client = new Anthropic();
 export async function summarizeThread(release: GitHubRelease): Promise<string[]> {
   const message = await client.messages.create({
     model: "claude-sonnet-4-20250514",
-    max_tokens: 1024,
+    max_tokens: 2048,
     messages: [
       {
         role: "user",
@@ -29,24 +29,23 @@ Fixes:
 Improvements:
 • Improvement described specifically"
 
-Now create a 3-tweet thread for this OpenAI Codex CLI release.
+Now create a 4-tweet thread for this OpenAI Codex CLI release.
 
 Rules:
 - Each tweet can be up to 4000 characters (X Premium)
-- Tweet 1: Short overview. Start with "Codex CLI v${release.version} has been released." Add a count of changes. List top 3 highlights with bullet points. End with "Complete details in thread ↓"
-- Tweet 2: All new features with detailed bullet points. Categorize as "New features:" — be specific about what each feature does and why it matters.
+- Tweet 1: Short overview. Start with "Codex CLI v${release.version} has been released." Add a count of changes. List top 3 highlights as short headlines (e.g. "Fast mode enabled by default" not a full sentence). End with "Complete details in thread ↓"
+- Tweet 2: New features with bullet points. Be specific when the feature needs explanation, but keep it short when the name is self-explanatory. Don't over-explain obvious things.
 - Tweet 3: Bug fixes, docs, and other changes. Categorize as "Fixes:", "Docs:", etc. State what was broken and how it's fixed.
+- Tweet 4: Full raw changelog — list every item from the Changelog section (commit titles) as bullet points. Skip dependency bumps (@dependabot items). End with "Full release notes:" and the release URL.
 - No hashtags, no emojis
-- Skip dependency bumps and chores — only user-facing changes
 - Be technically specific, not vague
-- End tweet 3 with "Full release notes:" and the release URL
 
 Release notes:
 ${release.body}
 
 Release URL: ${release.url}
 
-Reply with EXACTLY 3 tweets, separated by ---. Nothing else.`,
+Reply with EXACTLY 4 tweets, separated by ---. Nothing else.`,
       },
     ],
   });
