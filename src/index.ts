@@ -1,6 +1,7 @@
+import "dotenv/config";
 import { fetchLatestRelease } from "./github.js";
-import { summarizeTweet } from "./summarize.js";
-import { postTweet } from "./twitter.js";
+import { summarizeThread } from "./summarize.js";
+import { postThread } from "./twitter.js";
 import { getLastVersion, setLastVersion } from "./state.js";
 
 const DRY_RUN = process.env.DRY_RUN === "true";
@@ -24,20 +25,20 @@ async function main() {
 
   console.log("New release detected!");
 
+  console.log("Generating thread...");
+  const tweets = await summarizeThread(release);
+
+  console.log(`\nThread (${tweets.length} tweets):`);
+  tweets.forEach((t, i) => console.log(`\n[${i + 1}] (${t.length}/4000)\n${t}`));
+
   if (DRY_RUN) {
-    console.log("\n[DRY RUN] Release notes:\n");
-    console.log(release.body);
-    console.log(`\nURL: ${release.url}`);
-    console.log("(Skipping Claude API and Twitter in dry-run mode)");
+    console.log("\n[DRY RUN] Skipping Twitter post.");
     return;
   }
 
-  console.log("Generating tweet...");
-  const tweet = await summarizeTweet(release);
-
-  await postTweet(tweet);
+  await postThread(tweets);
   setLastVersion(release.version);
-  console.log(`State updated to v${release.version}`);
+  console.log(`\nState updated to v${release.version}`);
 }
 
 main().catch((err) => {

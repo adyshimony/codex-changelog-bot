@@ -20,9 +20,23 @@ function getClient(): TwitterApi {
   });
 }
 
-export async function postTweet(text: string): Promise<string> {
+export async function postThread(tweets: string[]): Promise<string[]> {
   const client = getClient();
-  const { data } = await client.v2.tweet(text);
-  console.log(`Tweet posted: https://x.com/i/status/${data.id}`);
-  return data.id;
+  const ids: string[] = [];
+
+  for (let i = 0; i < tweets.length; i++) {
+    const options: { text: string; reply?: { in_reply_to_tweet_id: string } } = {
+      text: tweets[i],
+    };
+
+    if (i > 0 && ids.length > 0) {
+      options.reply = { in_reply_to_tweet_id: ids[ids.length - 1] };
+    }
+
+    const { data } = await client.v2.tweet(options);
+    ids.push(data.id);
+    console.log(`Tweet ${i + 1}/${tweets.length} posted: https://x.com/i/status/${data.id}`);
+  }
+
+  return ids;
 }
