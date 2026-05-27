@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { GitHubRelease } from "./github.js";
+import { sanitizeXPost } from "./sanitize.js";
 
 const client = new Anthropic();
 
@@ -55,7 +56,7 @@ Reply with EXACTLY 4 tweets, separated by ---. Nothing else.`,
 
   const tweets = text
     .split("---")
-    .map((t) => t.trim())
+    .map((t) => sanitizeXPost(t.trim()))
     .filter((t) => t.length > 0);
 
   for (let i = 0; i < tweets.length; i++) {
