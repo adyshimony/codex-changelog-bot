@@ -1,12 +1,34 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { GitHubRelease } from "./github.js";
+import { DEFAULT_ANTHROPIC_MODEL, pickAnthropicModel } from "./model.js";
 import { sanitizeXPost } from "./sanitize.js";
 
 const client = new Anthropic();
 
+async function resolveAnthropicModel(): Promise<string> {
+  const configuredModel = process.env.ANTHROPIC_MODEL;
+  if (configuredModel?.trim()) {
+    return configuredModel.trim();
+  }
+
+  try {
+    const models = await client.models.list({ limit: 100 });
+    return pickAnthropicModel(models.data);
+  } catch (err) {
+    console.warn(
+      `Could not list Anthropic models, falling back to ${DEFAULT_ANTHROPIC_MODEL}:`,
+      err
+    );
+    return DEFAULT_ANTHROPIC_MODEL;
+  }
+}
+
 export async function summarizeThread(release: GitHubRelease): Promise<string[]> {
+  const model = await resolveAnthropicModel();
+  console.log(`Using Anthropic model: ${model}`);
+
   const message = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model,
     max_tokens: 2048,
     messages: [
       {
